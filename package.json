@@ -1,6 +1,6 @@
 {
   "name": "echarts-ng",
-  "version": "0.1.7",
+  "version": "0.3.15",
   "description": "Simple angularjs wrap for Baidu echarts.",
   "main": "dist/echarts-ng.js",
   "dependencies": {},

@@ -86,7 +86,7 @@
           });
         }
 
-        if (vm.$onInit) {
+        if (angular.version.minor >= 5) {
           vm.$onInit = init;
         }
         else {

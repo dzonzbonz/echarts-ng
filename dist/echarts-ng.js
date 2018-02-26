@@ -663,7 +663,7 @@
       controller: ['$scope', '$element', function ($scope, $element) {
         var vm = this;
 
-        vm.$onInit = function () {
+        var init = function () {
           var OPTION = $echarts.getEchartsGlobalOption(),
             identity = vm.echarts,
             config = vm.config,
@@ -714,7 +714,15 @@
             $echarts.removeEchartsInstance(identity);
             $dimension.removeEchartsDimension(element);
           });
-        };
+        }
+
+        if (vm.$onInit) {
+          vm.$onInit = init;
+        }
+        else {
+          init();
+        }
+        
       }],
       controllerAs: 'chart'
     }

@@ -19,6 +19,7 @@
    * @description - simple angular directive wrap for echarts
    */
   echartsDirective.$inject = ['$echarts', '$dimension'];
+
   function echartsDirective($echarts, $dimension) {
     return {
       priority: 5,
@@ -32,56 +33,58 @@
       controller: ['$scope', '$element', function ($scope, $element) {
         var vm = this;
 
-        var OPTION = $echarts.getEchartsGlobalOption()
-          , identity = vm.echarts
-          , config = vm.config
-          , element = $element[0];
+        vm.$onInit = function () {
+          var OPTION = $echarts.getEchartsGlobalOption(),
+            identity = vm.echarts,
+            config = vm.config,
+            element = $element[0];
 
-        if (!identity) {
-          throw new Error('Echarts Instance Identity Required');
-        }
-
-        /**
-         * @type number
-         *
-         * @description - 初始化高度设定，避免echarts绘制失败
-         */
-        $dimension.shouldAdaptDimension(element, vm.echartsDimension) && $dimension.adaptEchartsDimension(element, vm.echartsDimension);
-        /**
-         * @type object
-         *
-         * @description - echarts 实例对象
-         */
-        var instance;
-
-        instance = echarts.init(element, OPTION.theme);
-        instance.setOption(OPTION);
-
-        // 调色板增强
-        $echarts.driftEchartsPalette(instance, OPTION.driftPalette);
-        // 注册当前实例对象
-        $echarts.registerEchartsInstance(identity, instance);
-        // 绘制实例对象
-        $echarts.updateEchartsInstance(identity, vm.config);
-
-        $scope.$watchCollection('chart.config.title', function (current, prev) {
-          if (!angular.equals(current, prev)) {
-            $echarts.updateEchartsInstance(identity, vm.config);
+          if (!identity) {
+            throw new Error('Echarts Instance Identity Required');
           }
-        });
 
-        $scope.$watchCollection('chart.config.series', function (current, prev) {
-          if (!angular.equals(current, prev)) {
-            $echarts.updateEchartsInstance(identity, vm.config);
-          }
-        });
+          /**
+           * @type number
+           *
+           * @description - 初始化高度设定，避免echarts绘制失败
+           */
+          $dimension.shouldAdaptDimension(element, vm.echartsDimension) && $dimension.adaptEchartsDimension(element, vm.echartsDimension);
+          /**
+           * @type object
+           *
+           * @description - echarts 实例对象
+           */
+          var instance;
 
-        $scope.$on('$destroy', function () {
-          instance.clear();
-          instance.dispose();
-          $echarts.removeEchartsInstance(identity);
-          $dimension.removeEchartsDimension(element);
-        });
+          instance = echarts.init(element, OPTION.theme);
+          instance.setOption(OPTION);
+
+          // 调色板增强
+          $echarts.driftEchartsPalette(instance, OPTION.driftPalette);
+          // 注册当前实例对象
+          $echarts.registerEchartsInstance(identity, instance);
+          // 绘制实例对象
+          $echarts.updateEchartsInstance(identity, vm.config);
+
+          $scope.$watchCollection('chart.config.title', function (current, prev) {
+            if (!angular.equals(current, prev)) {
+              $echarts.updateEchartsInstance(identity, vm.config);
+            }
+          });
+
+          $scope.$watchCollection('chart.config.series', function (current, prev) {
+            if (!angular.equals(current, prev)) {
+              $echarts.updateEchartsInstance(identity, vm.config);
+            }
+          });
+
+          $scope.$on('$destroy', function () {
+            instance.clear();
+            instance.dispose();
+            $echarts.removeEchartsInstance(identity);
+            $dimension.removeEchartsDimension(element);
+          });
+        };
       }],
       controllerAs: 'chart'
     }
